@@ -224,19 +224,46 @@ def main():
                         add_userdata(nu, make_hashes(np))
                         st.success("Na ser cang!")
 
-    # --- CHAT ---
+# --- CHAT PAGE ---
     else:
         with st.sidebar:
             st.write(f"👤 **{st.session_state['username']}**")
+            
             if st.button("➕ New Chat"):
                 st.session_state["session_id"] = str(uuid.uuid4())
                 st.rerun()
+            
             st.markdown("---")
             sessions = get_user_sessions(st.session_state["username"])
             for sess_id, ts in sessions:
                 if st.button(f"📅 {ts[:16]}", key=sess_id):
                     st.session_state["session_id"] = sess_id
                     st.rerun()
+            
+            # --- ADMIN DASHBOARD START ---
+            if st.session_state["username"] == "Rose": # <-- NA MIN THLENG HIKA AH
+                st.markdown("---")
+                st.caption("📊 ADMIN ONLY")
+                
+                # Database Connection Check
+                conn = sqlite3.connect('users.db', check_same_thread=False)
+                c = conn.cursor()
+                
+                # User Count
+                c.execute('SELECT count(username) FROM userstable')
+                total_users = c.fetchone()[0]
+                st.write(f"Total Users: **{total_users}**")
+                
+                # List
+                with st.expander("View Users"):
+                    c.execute('SELECT username FROM userstable')
+                    all_users = c.fetchall()
+                    for u in all_users:
+                        st.write(f"• {u[0]}")
+                conn.close()
+            # --- ADMIN DASHBOARD END ---
+
+            st.markdown("---")
             if st.button("🚪 Logout"):
                 st.session_state["logged_in"] = False
                 st.rerun()

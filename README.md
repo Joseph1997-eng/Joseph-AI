@@ -90,6 +90,7 @@ chathistory(session_id, username, role, content, timestamp)
 
 feedback(username, message, timestamp)
 ```
+---
 ##🔒 Security Notes
 ```bash
 API keys must be stored inside Streamlit Secrets
@@ -117,13 +118,3 @@ If you like this project, please ★ star the repository!
 
 
 ---
-
-If you want, I can also create:
-
-✅ A beautiful project logo  
-✅ A preview screenshot (for README)  
-✅ A professional LICENSE (MIT)  
-✅ A CONTRIBUTING.md  
-✅ A GitHub Pages documentation site
-
-Just tell me!

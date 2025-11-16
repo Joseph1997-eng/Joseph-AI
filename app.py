@@ -18,7 +18,7 @@ if "GOOGLE_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 else:
     st.error("API Key a tlau! Streamlit Secrets ah chiah a hau.")
-BOT_AVATAR = "joseph.jpg" 
+BOT_AVATAR = "joseph.JPG" 
 
 # --- CSS: COLORS & GLASS UI ---
 page_bg_img = """

@@ -271,19 +271,16 @@ def main():
         with col2:
             # Animated Logo
             st.markdown(f"""
-            <div class="login-container">
-                <div style='display: flex; justify-content: center; margin-top: 30px;'>
-                    <div class='login-logo animate-fade-in'>
-                        <img src='{BOT_AVATAR}' alt='Logo'>
-                    </div>
+            <div style='display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;'>
+                <div class='login-logo animate-fade-in'>
+                    <img src='{BOT_AVATAR}' alt='Logo'>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("""
-                <h1 class="login-title animate-slide-up">Joseph's Assistant</h1>
-                <p class="login-subtitle animate-slide-up">LAI HOLH AI - Your Intelligent Companion</p>
-            """, unsafe_allow_html=True)
+            # Title and Subtitle - Using Streamlit native components
+            st.markdown("<h1 style='text-align: center; color: #a8c0ff; font-size: 2.5rem; margin-bottom: 10px; font-weight: 700;'>Joseph's Assistant</h1>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 30px;'>LAI HOLH AI - Your Intelligent Companion</p>", unsafe_allow_html=True)
             
             # Info Box with animation
             st.markdown("""

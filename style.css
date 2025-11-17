@@ -58,7 +58,7 @@
         transform: rotate(0deg);
     }
     to {
-        transform: rotate(360deg);
+        transform: rotate(0deg);
     }
 }
 
@@ -884,4 +884,5 @@ button:focus, input:focus, textarea:focus {
 ::-moz-selection {
     background: rgba(138, 43, 226, 0.5);
     color: white;
+
 }

@@ -1,0 +1,569 @@
+import streamlit as st
+import google.generativeai as genai
+import sqlite3
+import hashlib
+import uuid
+from datetime import datetime
+import os
+
+# ---------------------------------------------------------
+# 1. CONFIGURATION
+# ---------------------------------------------------------
+
+# Load API Key from environment variable or Streamlit secrets
+try:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+if API_KEY:
+    genai.configure(api_key=API_KEY)
+else:
+    st.error("⚠️ API Key not found! Please set GEMINI_API_KEY in secrets or environment variables.")
+
+# Bot Avatar URL
+BOT_AVATAR = "https://raw.githubusercontent.com/Joseph1997-eng/Joseph-AI/main/joseph.JPG"
+
+# Load System Prompt from external file
+def load_system_prompt():
+    try:
+        with open("system_prompt.txt", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return """You are a helpful AI assistant named Leoliver (Joseph). 
+You communicate in Lai language (Hakha dialect) and are wise, friendly, and caring."""
+
+# --- CSS Loader ---
+def load_css(file_name):
+    try:
+        with open(file_name) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.warning("style.css file not found! Running with default styles.")
+
+# ---------------------------------------------------------
+# 2. DATABASE FUNCTIONS
+# ---------------------------------------------------------
+def init_db():
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT PRIMARY KEY, password TEXT)')
+    c.execute('CREATE TABLE IF NOT EXISTS chathistory(session_id TEXT, username TEXT, role TEXT, content TEXT, timestamp TEXT)')
+    c.execute('CREATE TABLE IF NOT EXISTS feedback(username TEXT, message TEXT, timestamp TEXT)')
+    conn.commit()
+    conn.close()
+
+def make_hashes(password):
+    return hashlib.sha256(str.encode(password)).hexdigest()
+
+def check_hashes(password, hashed_text):
+    return make_hashes(password) == hashed_text
+
+def add_userdata(username, password):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    try:
+        c.execute('INSERT INTO userstable(username,password) VALUES (?,?)', (username, password))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
+def login_user(username, password):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('SELECT * FROM userstable WHERE username =? AND password = ?', (username, password))
+    data = c.fetchall()
+    conn.close()
+    return data
+
+def save_chat_message(session_id, username, role, content):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    c.execute('INSERT INTO chathistory(session_id, username, role, content, timestamp) VALUES (?,?,?,?,?)', 
+              (session_id, username, role, content, ts))
+    conn.commit()
+    conn.close()
+
+def get_chat_history(session_id):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('SELECT role, content FROM chathistory WHERE session_id=? ORDER BY timestamp', (session_id,))
+    data = c.fetchall()
+    conn.close()
+    return data
+
+def get_user_sessions(username):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('''
+        SELECT session_id, MAX(timestamp) as last_time
+        FROM chathistory 
+        WHERE username=? 
+        GROUP BY session_id 
+        ORDER BY last_time DESC
+        LIMIT 20
+    ''', (username,))
+    data = c.fetchall()
+    conn.close()
+    return data
+
+def delete_chat_session(session_id):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('DELETE FROM chathistory WHERE session_id=?', (session_id,))
+    conn.commit()
+    conn.close()
+
+def delete_all_sessions(username):
+    conn = sqlite3.connect('users.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute('DELETE FROM chathistory WHERE username=?', (username,))
+    conn.commit()
+    conn.close()
+
+# ---------------------------------------------------------
+# 3. MODEL SETTINGS
+# ---------------------------------------------------------
+system_prompt = load_system_prompt()
+
+model = genai.GenerativeModel(
+    model_name="gemini-2.5-flash",
+    system_instruction=system_prompt,
+    generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
+)
+
+# ---------------------------------------------------------
+# 4. COPY TO CLIPBOARD FUNCTION
+# ---------------------------------------------------------
+def create_copy_button_html(text, unique_id):
+    """Creates a working copy button with proper JavaScript"""
+    import json
+    
+    text_json = json.dumps(text)
+    
+    copy_button_html = f"""
+    <div style="margin-bottom: 10px; text-align: right;">
+        <button id="copy_btn_{unique_id}" 
+                onclick="copyText_{unique_id}()" 
+                class="copy-button"
+                style="
+                    background: linear-gradient(90deg, #6a5acd, #8a2be2);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 8px 16px;
+                    cursor: pointer;
+                    font-size: 13px;
+                    font-weight: 500;
+                    transition: all 0.3s;
+                    box-shadow: 0 2px 8px rgba(138, 43, 226, 0.3);
+                "
+                onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(138, 43, 226, 0.5)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(138, 43, 226, 0.3)';">
+            📋 Copy Text
+        </button>
+    </div>
+    
+    <script>
+    function copyText_{unique_id}() {{
+        const textToCopy = {text_json};
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {{
+            navigator.clipboard.writeText(textToCopy).then(function() {{
+                const btn = document.getElementById('copy_btn_{unique_id}');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '✅ Copied!';
+                btn.style.background = 'linear-gradient(90deg, #2ecc71, #27ae60)';
+                
+                setTimeout(function() {{
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = 'linear-gradient(90deg, #6a5acd, #8a2be2)';
+                }}, 2000);
+            }}).catch(function(err) {{
+                fallbackCopy_{unique_id}(textToCopy);
+            }});
+        }} else {{
+            fallbackCopy_{unique_id}(textToCopy);
+        }}
+    }}
+    
+    function fallbackCopy_{unique_id}(text) {{
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {{
+            document.execCommand('copy');
+            const btn = document.getElementById('copy_btn_{unique_id}');
+            btn.innerHTML = '✅ Copied!';
+            btn.style.background = 'linear-gradient(90deg, #2ecc71, #27ae60)';
+            setTimeout(function() {{
+                btn.innerHTML = '📋 Copy Text';
+                btn.style.background = 'linear-gradient(90deg, #6a5acd, #8a2be2)';
+            }}, 2000);
+        }} catch (err) {{
+            console.error('Copy failed:', err);
+        }}
+        
+        document.body.removeChild(textArea);
+    }}
+    </script>
+    """
+    return copy_button_html
+
+# ---------------------------------------------------------
+# 5. APP INTERFACE
+# ---------------------------------------------------------
+def main():
+    st.set_page_config(
+        page_title="Joseph's Assistant - LAI AI",
+        page_icon="🤖",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+    
+    load_css("style.css")
+    init_db()
+
+    # Session State Initialization
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+    if "username" not in st.session_state:
+        st.session_state["username"] = ""
+    if "session_id" not in st.session_state:
+        st.session_state["session_id"] = str(uuid.uuid4())
+    if "show_welcome" not in st.session_state:
+        st.session_state["show_welcome"] = True
+
+    # ---------------------------------------------------------
+    # LOGIN PAGE
+    # ---------------------------------------------------------
+    if not st.session_state["logged_in"]:
+        # Add animated background
+        st.markdown("""
+        <div class="login-background">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            # Animated Logo
+            st.markdown(f"""
+            <div class="login-container">
+                <div style='display: flex; justify-content: center; margin-top: 30px;'>
+                    <div class='login-logo animate-fade-in'>
+                        <img src='{BOT_AVATAR}' alt='Logo'>
+                    </div>
+                </div>
+                
+                <h1 class="login-title animate-slide-up">Joseph's Assistant</h1>
+                <p class="login-subtitle animate-slide-up">LAI HOLH AI - Your Intelligent Companion</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Info Box with animation
+            st.markdown("""
+            <div class="info-box animate-fade-in">
+                <h3>🎯 Kan Hmuitinh</h3>
+                <p>Lai holh tein bia ruah khawh le fimnak hrawmh.</p>
+                <p><strong>Account Info:</strong> Account ser law na lut kho colh, asiloah na ngeih cia mi hmang in lut.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            tab1, tab2 = st.tabs(["🔐 Sign In", "📝 Register"])
+            
+            with tab1:
+                with st.form("login_form"):
+                    u = st.text_input("👤 User Name", placeholder="Enter your username")
+                    p = st.text_input("🔒 Password", type='password', placeholder="Enter your password")
+                    submitted = st.form_submit_button("🚀 Lut (Login)", use_container_width=True)
+                    
+                    if submitted:
+                        if u and p:
+                            hp = make_hashes(p)
+                            if login_user(u, hp):
+                                st.session_state["logged_in"] = True
+                                st.session_state["username"] = u
+                                st.success("✅ Login successful!")
+                                st.balloons()
+                                st.rerun()
+                            else:
+                                st.error("❌ Invalid username or password!")
+                        else:
+                            st.warning("⚠️ Please fill in all fields!")
+            
+            with tab2:
+                with st.form("register_form"):
+                    nu = st.text_input("👤 Min Thar", placeholder="Choose a username")
+                    np = st.text_input("🔒 Password Thar", type='password', placeholder="Create a password")
+                    np2 = st.text_input("🔒 Confirm Password", type='password', placeholder="Confirm your password")
+                    submitted = st.form_submit_button("✨ Account Ser (Register)", use_container_width=True)
+                    
+                    if submitted:
+                        if nu and np and np2:
+                            if np != np2:
+                                st.error("❌ Passwords don't match!")
+                            elif len(np) < 6:
+                                st.error("❌ Password must be at least 6 characters!")
+                            else:
+                                if add_userdata(nu, make_hashes(np)):
+                                    st.success("✅ Account created successfully! Please sign in.")
+                                    st.balloons()
+                                else:
+                                    st.error("❌ Username already exists!")
+                        else:
+                            st.warning("⚠️ Please fill in all fields!")
+
+            # Footer
+            st.markdown("""
+            <div class='login-footer animate-fade-in'>
+                <p>Need help? Contact us:</p>
+                <p>
+                    <a href='https://github.com/Joseph1997-eng' target='_blank'>
+                        <i class="fab fa-github"></i> GitHub
+                    </a> | 
+                    <a href='mailto:josephsaimonn@gmail.com'>
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                </p>
+                <p class="copyright">© 2024 Joseph's Assistant. All rights reserved.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # ---------------------------------------------------------
+    # CHAT PAGE
+    # ---------------------------------------------------------
+    else:
+        with st.sidebar:
+            # User Profile Section
+            st.markdown(f"""
+            <div class="user-profile">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name">{st.session_state['username']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # New Chat Button
+            if st.button("➕ New Chat", use_container_width=True, key="new_chat_btn"):
+                st.session_state["session_id"] = str(uuid.uuid4())
+                st.session_state["show_welcome"] = True
+                st.rerun()
+            
+            st.markdown("---")
+            
+            # Objective Box
+            st.markdown("""
+            <div class="sidebar-section">
+                <h4>🎯 KAN HMUITINH</h4>
+                <p>Lai holh tein bia ruah khawh le fimnak hrawmh.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("---")
+            
+            # Chat History
+            st.markdown("### 🕒 History")
+            
+            sessions = get_user_sessions(st.session_state["username"])
+            if sessions:
+                # Delete All Button
+                if st.button("🗑️ Clear All History", use_container_width=True, type="secondary"):
+                    delete_all_sessions(st.session_state["username"])
+                    st.session_state["session_id"] = str(uuid.uuid4())
+                    st.success("✅ All chat history cleared!")
+                    st.rerun()
+                
+                st.markdown("<div class='chat-history'>", unsafe_allow_html=True)
+                for sess_id, ts in sessions:
+                    is_current = (sess_id == st.session_state["session_id"])
+                    col1, col2 = st.columns([4, 1])
+                    
+                    with col1:
+                        button_type = "primary" if is_current else "secondary"
+                        if st.button(
+                            f"{'📍' if is_current else '📅'} {ts[:16]}", 
+                            key=f"load_{sess_id}", 
+                            use_container_width=True,
+                            type=button_type
+                        ):
+                            st.session_state["session_id"] = sess_id
+                            st.session_state["show_welcome"] = False
+                            st.rerun()
+                    
+                    with col2:
+                        if st.button("🗑️", key=f"del_{sess_id}", use_container_width=True):
+                            delete_chat_session(sess_id)
+                            if st.session_state["session_id"] == sess_id:
+                                st.session_state["session_id"] = str(uuid.uuid4())
+                            st.rerun()
+                
+                st.markdown("</div>", unsafe_allow_html=True)
+            else:
+                st.info("💬 No chat history yet. Start a conversation!")
+            
+            # Admin Dashboard
+            if st.session_state["username"] == "Joe":
+                st.markdown("---")
+                st.markdown("### 📊 Admin Panel")
+                
+                conn = sqlite3.connect('users.db', check_same_thread=False)
+                c = conn.cursor()
+                c.execute('SELECT count(username) FROM userstable')
+                total_users = c.fetchone()[0]
+                
+                st.metric("Total Users", total_users)
+                
+                with st.expander("👥 View All Users"):
+                    c.execute('SELECT username FROM userstable')
+                    all_users = c.fetchall()
+                    for u in all_users:
+                        st.write(f"• {u[0]}")
+                conn.close()
+
+            st.markdown("---")
+            
+            # Contact Section
+            st.markdown("""
+            <div class="sidebar-contact">
+                <h4>📞 PEHTLAIHNAK</h4>
+                <p><a href='https://github.com/Joseph1997-eng' target='_blank'>🔗 GitHub</a></p>
+                <p><a href='mailto:josephsaimonn@gmail.com'>📧 Email</a></p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Logout Button
+            if st.button("🚪 Logout", use_container_width=True, type="secondary"):
+                st.session_state["logged_in"] = False
+                st.session_state["username"] = ""
+                st.rerun()
+
+        # ---------------------------------------------------------
+        # MAIN CHAT AREA
+        # ---------------------------------------------------------
+        
+        # Header
+        st.markdown(f"""
+        <div class="title-container animate-slide-down">
+            <div class="title-logo">
+                <img src='{BOT_AVATAR}' alt='Logo'>
+            </div>
+            <div class="title-text">
+                <h1>Joseph's Assistant</h1>
+                <h3>🤝 Na dam maw, {st.session_state['username']}?</h3>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Welcome Message for New Chats
+        db_messages = get_chat_history(st.session_state["session_id"])
+        
+        if not db_messages and st.session_state.get("show_welcome", True):
+            st.markdown("""
+            <div class="welcome-message animate-fade-in">
+                <h2>👋 Welcome to Joseph's Assistant!</h2>
+                <p>I'm here to help you in Lai language. Feel free to ask me anything!</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h4>Natural Conversation</h4>
+                        <p>Chat naturally in Lai language</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <h4>Knowledge Base</h4>
+                        <p>Ask about any topic</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h4>Helpful & Wise</h4>
+                        <p>Get thoughtful responses</p>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Display Chat Messages
+        for idx, (role, content) in enumerate(db_messages):
+            av = BOT_AVATAR if role == "assistant" else "🙆‍♂️"
+            
+            if role == "assistant":
+                with st.chat_message(role, avatar=av):
+                    import streamlit.components.v1 as components
+                    unique_id = f"msg_{st.session_state['session_id'][:8]}_{idx}"
+                    components.html(create_copy_button_html(content, unique_id), height=50)
+                    st.markdown(f'<div class="chat-message-content animate-fade-in">{content}</div>', unsafe_allow_html=True)
+            else:
+                with st.chat_message(role, avatar=av):
+                    st.markdown(f'<div class="chat-message-content animate-fade-in">{content}</div>', unsafe_allow_html=True)
+
+        # File Upload
+        uploaded_file = st.file_uploader(
+            "📎 Upload File (Optional)",
+            type=["pdf", "jpg", "png", "mp3", "txt", "docx", "xlsx", "pptx", "mp4"],
+            help="Upload a file to analyze or discuss"
+        )
+
+        # Chat Input
+        user_input = st.chat_input("💭 Type your message here...")
+        
+        if user_input:
+            st.session_state["show_welcome"] = False
+            save_chat_message(st.session_state["session_id"], st.session_state["username"], "user", user_input)
+            st.rerun()
+
+        last_db_role = db_messages[-1][0] if db_messages else None
+        
+        # Generate Response
+        if last_db_role == 'user':
+            current_prompt = db_messages[-1][1]
+            
+            with st.chat_message("assistant", avatar=BOT_AVATAR):
+                with st.spinner("🤔 Ka ruat ta lio..."):
+                    try:
+                        import streamlit.components.v1 as components
+                        
+                        gemini_hist = []
+                        for r, c in db_messages[:-1]:
+                            role_name = "model" if r == "assistant" else "user"
+                            gemini_hist.append({"role": role_name, "parts": [c]})
+                        
+                        user_context = f"[User Min: {st.session_state['username']}]. "
+                        full_prompt_to_send = user_context + current_prompt
+
+                        inputs = [full_prompt_to_send]
+                        if uploaded_file:
+                            inputs = [{"mime_type": uploaded_file.type, "data": uploaded_file.getvalue()}, full_prompt_to_send]
+
+                        if uploaded_file:
+                            response = model.generate_content(inputs)
+                        else:
+                            chat = model.start_chat(history=gemini_hist)
+                            response = chat.send_message(full_prompt_to_send)
+                        
+                        raw_text = response.text
+                        final_text = raw_text.replace("*", "")
+                        
+                        unique_id = f"latest_{st.session_state['session_id'][:8]}"
+                        components.html(create_copy_button_html(final_text, unique_id), height=50)
+                        st.markdown(f'<div class="chat-message-content animate-fade-in">{final_text}</div>', unsafe_allow_html=True)
+                        
+                        save_chat_message(st.session_state["session_id"], st.session_state["username"], "assistant", final_text)
+                        
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+                        st.info("💡 Please check your API key or try again later.")
+
+if __name__ == '__main__':
+    main()

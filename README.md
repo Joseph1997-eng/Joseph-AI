@@ -21,7 +21,7 @@ An advanced AI chatbot that communicates in Lai language (Hakha dialect) with a 
 
 ## 🚀 Demo
 
-![App Screenshot](https://via.placeholder.com/800x400?text=Add+Your+Screenshot+Here)
+![App Screenshot](Preview.png)
 
 ## 📋 Prerequisites
 

@@ -131,7 +131,7 @@ def delete_all_sessions(username):
 system_prompt = load_system_prompt()
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
+    model_name="gemini-2.0-flash-exp",
     system_instruction=system_prompt,
     generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
 )
@@ -267,10 +267,12 @@ def main():
                         <img src='{BOT_AVATAR}' alt='Logo'>
                     </div>
                 </div>
-                
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
                 <h1 class="login-title animate-slide-up">Joseph's Assistant</h1>
                 <p class="login-subtitle animate-slide-up">LAI HOLH AI - Your Intelligent Companion</p>
-            </div>
             """, unsafe_allow_html=True)
             
             # Info Box with animation

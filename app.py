@@ -24,13 +24,23 @@ else:
 # Bot Avatar URL
 BOT_AVATAR = "https://raw.githubusercontent.com/Joseph1997-eng/Joseph-AI/main/joseph.JPG"
 
-# Load System Prompt from external file
+# Load System Prompt from Streamlit secrets or file
 def load_system_prompt():
+    # Try to load from Streamlit secrets first (for Streamlit Cloud)
+    try:
+        return st.secrets["SYSTEM_PROMPT"]
+    except:
+        pass
+    
+    # Try to load from file (for local development)
     try:
         with open("system_prompt.txt", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        return """You are a helpful AI assistant named Leoliver (Joseph). 
+        pass
+    
+    # Fallback default prompt
+    return """You are a helpful AI assistant named Leoliver (Joseph). 
 You communicate in Lai language (Hakha dialect) and are wise, friendly, and caring."""
 
 # --- CSS Loader ---
@@ -131,7 +141,7 @@ def delete_all_sessions(username):
 system_prompt = load_system_prompt()
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
+    model_name="gemini-2.5-flash",
     system_instruction=system_prompt,
     generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
 )

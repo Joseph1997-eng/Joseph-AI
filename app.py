@@ -347,7 +347,7 @@ def main():
                         <i class="fas fa-envelope"></i> Email
                     </a>
                 </p>
-                <p class="copyright">© 2024 Joseph's Assistant. All rights reserved.</p>
+                <p class="copyright">© 2025 Joseph's Assistant. All rights reserved.</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -576,3 +576,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

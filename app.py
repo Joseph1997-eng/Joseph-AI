@@ -143,7 +143,7 @@ system_prompt = load_system_prompt()
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
     system_instruction=system_prompt,
-    generation_config=genai.GenerationConfig(temperature=1.2, max_output_tokens=8000)
+    generation_config=genai.GenerationConfig(temperature=1.0, max_output_tokens=8000)
 )
 
 # ---------------------------------------------------------
@@ -680,3 +680,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

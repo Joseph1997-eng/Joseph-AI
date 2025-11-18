@@ -58,7 +58,7 @@
         transform: rotate(0deg);
     }
     to {
-        transform: rotate(0deg);
+        transform: rotate(360deg);
     }
 }
 
@@ -141,10 +141,34 @@ body {
     background: linear-gradient(180deg, #0a0a15 0%, #1a1a2e 100%);
     border-right: 1px solid rgba(138, 43, 226, 0.3);
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease-in-out;
 }
 
 [data-testid="stSidebar"] > div:first-child {
     background: transparent;
+    padding-top: 1rem;
+}
+
+/* Sidebar Collapse Button */
+[data-testid="collapsedControl"] {
+    background: linear-gradient(135deg, #6a5acd, #8a2be2) !important;
+    color: white !important;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+[data-testid="collapsedControl"]:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.6);
+}
+
+/* Sidebar when collapsed */
+[data-testid="stSidebar"][aria-expanded="false"] {
+    transform: translateX(-100%);
+}
+
+[data-testid="stSidebar"][aria-expanded="true"] {
+    transform: translateX(0);
 }
 
 /* User Profile Card */
@@ -884,5 +908,4 @@ button:focus, input:focus, textarea:focus {
 ::-moz-selection {
     background: rgba(138, 43, 226, 0.5);
     color: white;
-
 }

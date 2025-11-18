@@ -143,7 +143,7 @@ system_prompt = load_system_prompt()
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
     system_instruction=system_prompt,
-    generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
+    generation_config=genai.GenerationConfig(temperature=1.2, max_output_tokens=8000)
 )
 
 # ---------------------------------------------------------
@@ -295,8 +295,8 @@ def main():
             
             with tab1:
                 with st.form("login_form"):
-                    u = st.text_input("👤 User Name", placeholder="Enter your username")
-                    p = st.text_input("🔒 Password", type='password', placeholder="Enter your password")
+                    u = st.text_input("👤 User Name", placeholder="Na Min Tialnak")
+                    p = st.text_input("🔒 Password", type='password', placeholder="Password Tialnak")
                     submitted = st.form_submit_button("🚀 Lut (Login)", use_container_width=True)
                     
                     if submitted:
@@ -315,9 +315,9 @@ def main():
             
             with tab2:
                 with st.form("register_form"):
-                    nu = st.text_input("👤 Min Thar", placeholder="Choose a username")
-                    np = st.text_input("🔒 Password Thar", type='password', placeholder="Create a password")
-                    np2 = st.text_input("🔒 Confirm Password", type='password', placeholder="Confirm your password")
+                    nu = st.text_input("👤 Min Thar", placeholder="Na Min Thar Tialnak")
+                    np = st.text_input("🔒 Password Thar", type='password', placeholder="Password Thar Tialnak")
+                    np2 = st.text_input("🔒 Confirm Password", type='password', placeholder="Password Thar Tial Thannak")
                     submitted = st.form_submit_button("✨ Account Ser (Register)", use_container_width=True)
                     
                     if submitted:
@@ -517,15 +517,108 @@ def main():
                 with st.chat_message(role, avatar=av):
                     st.markdown(f'<div class="chat-message-content animate-fade-in">{content}</div>', unsafe_allow_html=True)
 
-        # File Upload
-        uploaded_file = st.file_uploader(
-            "📎 Upload File (Optional)",
-            type=["pdf", "jpg", "png", "mp3", "txt", "docx", "xlsx", "pptx", "mp4"],
-            help="Upload a file to analyze or discuss"
-        )
+        # File Upload with Custom Button
+        col_upload, col_spacer = st.columns([1, 5])
+        
+        with col_upload:
+            # Custom styled file uploader
+            st.markdown("""
+            <style>
+            .upload-button {
+                position: relative;
+            }
+            
+            /* Hide default file uploader text */
+            [data-testid="stFileUploader"] label {
+                display: none !important;
+            }
+            
+            [data-testid="stFileUploader"] section {
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+            }
+            
+            [data-testid="stFileUploader"] button {
+                background: linear-gradient(135deg, #6a5acd, #8a2be2) !important;
+                border: none !important;
+                border-radius: 50% !important;
+                width: 50px !important;
+                height: 50px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                transition: all 0.3s !important;
+                box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4) !important;
+                font-size: 24px !important;
+                color: white !important;
+                padding: 0 !important;
+                margin-bottom: 10px !important;
+            }
+            
+            [data-testid="stFileUploader"] button:hover {
+                transform: scale(1.1) !important;
+                box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6) !important;
+                background: linear-gradient(135deg, #8a2be2, #6a5acd) !important;
+            }
+            
+            [data-testid="stFileUploader"] button::before {
+                content: "+" !important;
+                font-size: 28px !important;
+                font-weight: 300 !important;
+                line-height: 1 !important;
+            }
+            
+            /* Hide the default text inside button */
+            [data-testid="stFileUploader"] button > div {
+                display: none !important;
+            }
+            
+            /* Style for uploaded file display */
+            [data-testid="stFileUploader"] [data-testid="stFileUploaderFileName"] {
+                background: rgba(106, 90, 205, 0.2) !important;
+                border-radius: 8px !important;
+                padding: 8px 12px !important;
+                color: #a8c0ff !important;
+                font-size: 13px !important;
+                margin-top: 5px !important;
+            }
+            
+            /* Delete button for uploaded file */
+            [data-testid="stFileUploader"] button[kind="icon"] {
+                width: 24px !important;
+                height: 24px !important;
+                border-radius: 50% !important;
+                background: rgba(220, 53, 69, 0.8) !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            uploaded_file = st.file_uploader(
+                "",
+                type=["pdf", "jpg", "png", "jpeg", "mp3", "txt", "docx", "xlsx", "pptx", "mp4"],
+                help="Click + to upload file",
+                label_visibility="collapsed"
+            )
+        
+        # Show file info if uploaded
+        if uploaded_file:
+            st.markdown(f"""
+            <div style="background: rgba(106, 90, 205, 0.15); 
+                        border-left: 3px solid #8a2be2; 
+                        border-radius: 8px; 
+                        padding: 12px 16px; 
+                        margin-bottom: 15px;
+                        animation: fadeIn 0.4s ease-out;">
+                <span style="color: #a8c0ff; font-weight: 500;">📎 File attached:</span>
+                <span style="color: #ccc; margin-left: 8px;">{uploaded_file.name}</span>
+                <span style="color: #888; margin-left: 8px; font-size: 12px;">({uploaded_file.size / 1024:.1f} KB)</span>
+            </div>
+            """, unsafe_allow_html=True)
 
         # Chat Input
-        user_input = st.chat_input("💭 Type your message here...")
+        user_input = st.chat_input("💭 Biahalnak ...")
         
         if user_input:
             st.session_state["show_welcome"] = False
@@ -539,41 +632,51 @@ def main():
             current_prompt = db_messages[-1][1]
             
             with st.chat_message("assistant", avatar=BOT_AVATAR):
-                with st.spinner("🤔 Ka ruat ta lio..."):
-                    try:
-                        import streamlit.components.v1 as components
-                        
-                        gemini_hist = []
-                        for r, c in db_messages[:-1]:
-                            role_name = "model" if r == "assistant" else "user"
-                            gemini_hist.append({"role": role_name, "parts": [c]})
-                        
-                        user_context = f"[User Min: {st.session_state['username']}]. "
-                        full_prompt_to_send = user_context + current_prompt
+                # Custom loading animation with word-by-word effect
+                loading_placeholder = st.empty()
+                loading_placeholder.markdown("""
+                <div class="loading-text" style="color: #a8c0ff; font-size: 16px; font-weight: 500; padding: 10px;">
+                    <span>Ka</span> <span>ruat</span> <span>ta</span> <span>lio...</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                try:
+                    import streamlit.components.v1 as components
+                    
+                    gemini_hist = []
+                    for r, c in db_messages[:-1]:
+                        role_name = "model" if r == "assistant" else "user"
+                        gemini_hist.append({"role": role_name, "parts": [c]})
+                    
+                    user_context = f"[User Min: {st.session_state['username']}]. "
+                    full_prompt_to_send = user_context + current_prompt
 
-                        inputs = [full_prompt_to_send]
-                        if uploaded_file:
-                            inputs = [{"mime_type": uploaded_file.type, "data": uploaded_file.getvalue()}, full_prompt_to_send]
+                    inputs = [full_prompt_to_send]
+                    if uploaded_file:
+                        inputs = [{"mime_type": uploaded_file.type, "data": uploaded_file.getvalue()}, full_prompt_to_send]
 
-                        if uploaded_file:
-                            response = model.generate_content(inputs)
-                        else:
-                            chat = model.start_chat(history=gemini_hist)
-                            response = chat.send_message(full_prompt_to_send)
-                        
-                        raw_text = response.text
-                        final_text = raw_text.replace("*", "")
-                        
-                        unique_id = f"latest_{st.session_state['session_id'][:8]}"
-                        components.html(create_copy_button_html(final_text, unique_id), height=50)
-                        st.markdown(f'<div class="chat-message-content animate-fade-in">{final_text}</div>', unsafe_allow_html=True)
-                        
-                        save_chat_message(st.session_state["session_id"], st.session_state["username"], "assistant", final_text)
-                        
-                    except Exception as e:
-                        st.error(f"❌ Error: {str(e)}")
-                        st.info("💡 Please check your API key or try again later.")
+                    if uploaded_file:
+                        response = model.generate_content(inputs)
+                    else:
+                        chat = model.start_chat(history=gemini_hist)
+                        response = chat.send_message(full_prompt_to_send)
+                    
+                    # Clear loading animation
+                    loading_placeholder.empty()
+                    
+                    raw_text = response.text
+                    final_text = raw_text.replace("*", "")
+                    
+                    unique_id = f"latest_{st.session_state['session_id'][:8]}"
+                    components.html(create_copy_button_html(final_text, unique_id), height=50)
+                    st.markdown(f'<div class="chat-message-content animate-fade-in">{final_text}</div>', unsafe_allow_html=True)
+                    
+                    save_chat_message(st.session_state["session_id"], st.session_state["username"], "assistant", final_text)
+                    
+                except Exception as e:
+                    loading_placeholder.empty()
+                    st.error(f"❌ Error: {str(e)}")
+                    st.info("💡 Please check your API key or try again later.")
 
 if __name__ == '__main__':
     main()
-

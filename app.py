@@ -143,7 +143,7 @@ system_prompt = load_system_prompt()
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
     system_instruction=system_prompt,
-    generation_config=genai.GenerationConfig(temperature=1.0, max_output_tokens=8000)
+    generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
 )
 
 # ---------------------------------------------------------
@@ -236,7 +236,7 @@ def main():
         page_title="Joseph's Assistant - LAI AI",
         page_icon="🤖",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"  # Start with sidebar collapsed
     )
     
     load_css("style.css")
@@ -295,7 +295,7 @@ def main():
             
             with tab1:
                 with st.form("login_form"):
-                    u = st.text_input("👤 User Name", placeholder="Na Min Tialnak")
+                    u = st.text_input("👤 User Name", placeholder="Min Tialnak")
                     p = st.text_input("🔒 Password", type='password', placeholder="Password Tialnak")
                     submitted = st.form_submit_button("🚀 Lut (Login)", use_container_width=True)
                     
@@ -315,7 +315,7 @@ def main():
             
             with tab2:
                 with st.form("register_form"):
-                    nu = st.text_input("👤 Min Thar", placeholder="Na Min Thar Tialnak")
+                    nu = st.text_input("👤 Min Thar", placeholder="Min Thar Peknak")
                     np = st.text_input("🔒 Password Thar", type='password', placeholder="Password Thar Tialnak")
                     np2 = st.text_input("🔒 Confirm Password", type='password', placeholder="Password Thar Tial Thannak")
                     submitted = st.form_submit_button("✨ Account Ser (Register)", use_container_width=True)
@@ -462,6 +462,182 @@ def main():
         # MAIN CHAT AREA
         # ---------------------------------------------------------
         
+        # Add scroll to bottom button and floating upload button
+        st.markdown("""
+        <style>
+        /* Scroll to Bottom Button */
+        .scroll-bottom-btn {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6a5acd, #8a2be2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(138, 43, 226, 0.5);
+            z-index: 999;
+            transition: all 0.3s;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .scroll-bottom-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 24px rgba(138, 43, 226, 0.7);
+        }
+        
+        .scroll-bottom-btn::before {
+            content: "⬇";
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* Floating Upload Button */
+        .floating-upload-btn {
+            position: fixed;
+            bottom: 60px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #8a2be2, #6a5acd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .floating-upload-btn:hover {
+            transform: rotate(90deg) scale(1.15);
+            box-shadow: 0 8px 28px rgba(138, 43, 226, 0.8);
+        }
+        
+        .floating-upload-btn::before {
+            content: "+";
+            font-size: 32px;
+            color: white;
+            font-weight: 300;
+        }
+        
+        /* Upload Modal/Tooltip */
+        .upload-tooltip {
+            position: fixed;
+            bottom: 125px;
+            right: 30px;
+            background: rgba(31, 31, 49, 0.95);
+            border: 2px solid #8a2be2;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #a8c0ff;
+            font-size: 13px;
+            z-index: 999;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            white-space: nowrap;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Sidebar Toggle Button */
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #6a5acd, #8a2be2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
+            z-index: 1001;
+            transition: all 0.3s;
+            gap: 5px;
+            padding: 10px;
+        }
+        
+        .sidebar-toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
+        }
+        
+        .sidebar-toggle-btn span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-toggle-btn:hover span {
+            width: 20px;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .scroll-bottom-btn,
+            .floating-upload-btn {
+                right: 15px;
+            }
+            
+            .scroll-bottom-btn {
+                bottom: 100px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .floating-upload-btn {
+                bottom: 45px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .upload-tooltip {
+                right: 15px;
+                bottom: 105px;
+            }
+            
+            .sidebar-toggle-btn {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+        </style>
+        
+        <script>
+        // Scroll to bottom functionality
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Show/hide scroll button based on scroll position
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.querySelector('.scroll-bottom-btn');
+            if (scrollBtn) {
+                if (window.scrollY > 300) {
+                    scrollBtn.style.display = 'flex';
+                } else {
+                    scrollBtn.style.display = 'none';
+                }
+            }
+        });
+        </script>
+        
+        <div class="scroll-bottom-btn" onclick="scrollToBottom()" title="Scroll to bottom"></div>
+        """, unsafe_allow_html=True)
+        
         # Header
         st.markdown(f"""
         <div class="title-container animate-slide-down">
@@ -503,122 +679,98 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         
-        # Display Chat Messages
+        # Display Chat Messages - WhatsApp Style
         for idx, (role, content) in enumerate(db_messages):
-            av = BOT_AVATAR if role == "assistant" else "🙆‍♂️"
-            
             if role == "assistant":
-                with st.chat_message(role, avatar=av):
+                # AI messages on LEFT side (like WhatsApp)
+                col1, col2, col3 = st.columns([0.7, 0.05, 0.25])
+                with col1:
+                    st.markdown(f"""
+                    <div class="chat-bubble chat-bubble-assistant">
+                        <div class="chat-avatar">
+                            <img src="{BOT_AVATAR}" alt="AI">
+                        </div>
+                        <div class="chat-content">
+                            <div class="chat-message-text">{content}</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Copy button for assistant messages
                     import streamlit.components.v1 as components
                     unique_id = f"msg_{st.session_state['session_id'][:8]}_{idx}"
                     components.html(create_copy_button_html(content, unique_id), height=50)
-                    st.markdown(f'<div class="chat-message-content animate-fade-in">{content}</div>', unsafe_allow_html=True)
             else:
-                with st.chat_message(role, avatar=av):
-                    st.markdown(f'<div class="chat-message-content animate-fade-in">{content}</div>', unsafe_allow_html=True)
+                # User messages on RIGHT side (like WhatsApp)
+                col1, col2, col3 = st.columns([0.25, 0.05, 0.7])
+                with col3:
+                    st.markdown(f"""
+                    <div class="chat-bubble chat-bubble-user">
+                        <div class="chat-content">
+                            <div class="chat-message-text">{content}</div>
+                        </div>
+                        <div class="chat-avatar">
+                            <div class="user-avatar">👤</div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
-        # File Upload with Custom Button
-        col_upload, col_spacer = st.columns([1, 5])
+        # Floating Upload Button with Modal
+        upload_container = st.container()
+        with upload_container:
+            if 'show_upload' not in st.session_state:
+                st.session_state.show_upload = False
+            
+            # Create columns for upload button
+            col1, col2 = st.columns([0.85, 0.15])
+            
+            with col2:
+                if st.button("📎", key="upload_toggle", help="Upload file"):
+                    st.session_state.show_upload = not st.session_state.show_upload
+            
+            # Show upload widget if toggled
+            if st.session_state.show_upload:
+                with st.expander("📁 Upload File", expanded=True):
+                    uploaded_file = st.file_uploader(
+                        "Choose a file",
+                        type=["pdf", "jpg", "png", "jpeg", "mp3", "txt", "docx", "xlsx", "pptx", "mp4"],
+                        help="Upload any supported file",
+                        key="file_uploader"
+                    )
+                    
+                    if uploaded_file:
+                        st.success(f"✅ {uploaded_file.name} ({uploaded_file.size / 1024:.1f} KB)")
+            else:
+                uploaded_file = None
         
-        with col_upload:
-            # Custom styled file uploader
-            st.markdown("""
-            <style>
-            .upload-button {
-                position: relative;
-            }
-            
-            /* Hide default file uploader text */
-            [data-testid="stFileUploader"] label {
-                display: none !important;
-            }
-            
-            [data-testid="stFileUploader"] section {
-                padding: 0 !important;
-                border: none !important;
-                background: transparent !important;
-            }
-            
-            [data-testid="stFileUploader"] button {
-                background: linear-gradient(135deg, #6a5acd, #8a2be2) !important;
-                border: none !important;
-                border-radius: 50% !important;
-                width: 50px !important;
-                height: 50px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                cursor: pointer !important;
-                transition: all 0.3s !important;
-                box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4) !important;
-                font-size: 24px !important;
-                color: white !important;
-                padding: 0 !important;
-                margin-bottom: 10px !important;
-            }
-            
-            [data-testid="stFileUploader"] button:hover {
-                transform: scale(1.1) !important;
-                box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6) !important;
-                background: linear-gradient(135deg, #8a2be2, #6a5acd) !important;
-            }
-            
-            [data-testid="stFileUploader"] button::before {
-                content: "+" !important;
-                font-size: 28px !important;
-                font-weight: 300 !important;
-                line-height: 1 !important;
-            }
-            
-            /* Hide the default text inside button */
-            [data-testid="stFileUploader"] button > div {
-                display: none !important;
-            }
-            
-            /* Style for uploaded file display */
-            [data-testid="stFileUploader"] [data-testid="stFileUploaderFileName"] {
-                background: rgba(106, 90, 205, 0.2) !important;
-                border-radius: 8px !important;
-                padding: 8px 12px !important;
-                color: #a8c0ff !important;
-                font-size: 13px !important;
-                margin-top: 5px !important;
-            }
-            
-            /* Delete button for uploaded file */
-            [data-testid="stFileUploader"] button[kind="icon"] {
-                width: 24px !important;
-                height: 24px !important;
-                border-radius: 50% !important;
-                background: rgba(220, 53, 69, 0.8) !important;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            
-            uploaded_file = st.file_uploader(
-                "",
-                type=["pdf", "jpg", "png", "jpeg", "mp3", "txt", "docx", "xlsx", "pptx", "mp4"],
-                help="Click + to upload file",
-                label_visibility="collapsed"
-            )
+        # Add floating upload button CSS
+        st.markdown("""
+        <style>
+        /* Style the upload toggle button */
+        div[data-testid="column"]:last-child button {
+            position: fixed !important;
+            bottom: 60px !important;
+            right: 30px !important;
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #8a2be2, #6a5acd) !important;
+            border: none !important;
+            font-size: 24px !important;
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6) !important;
+            z-index: 1000 !important;
+            transition: all 0.3s !important;
+        }
         
-        # Show file info if uploaded
-        if uploaded_file:
-            st.markdown(f"""
-            <div style="background: rgba(106, 90, 205, 0.15); 
-                        border-left: 3px solid #8a2be2; 
-                        border-radius: 8px; 
-                        padding: 12px 16px; 
-                        margin-bottom: 15px;
-                        animation: fadeIn 0.4s ease-out;">
-                <span style="color: #a8c0ff; font-weight: 500;">📎 File attached:</span>
-                <span style="color: #ccc; margin-left: 8px;">{uploaded_file.name}</span>
-                <span style="color: #888; margin-left: 8px; font-size: 12px;">({uploaded_file.size / 1024:.1f} KB)</span>
-            </div>
-            """, unsafe_allow_html=True)
+        div[data-testid="column"]:last-child button:hover {
+            transform: rotate(90deg) scale(1.15) !important;
+            box-shadow: 0 8px 28px rgba(138, 43, 226, 0.8) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
         # Chat Input
-        user_input = st.chat_input("💭 Biahalnak ...")
+        user_input = st.chat_input("💭 Type your message here...")
         
         if user_input:
             st.session_state["show_welcome"] = False
@@ -680,4 +832,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

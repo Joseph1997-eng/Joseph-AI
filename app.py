@@ -141,7 +141,7 @@ def delete_all_sessions(username):
 system_prompt = load_system_prompt()
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
+    model="gemini-3-pro-preview",
     system_instruction=system_prompt,
     generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
 )
@@ -856,3 +856,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

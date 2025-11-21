@@ -740,7 +740,7 @@ def main():
             }
             
             [data-testid="stFileUploader"] button::before {
-                content: "+" !important;
+                content: "" !important;
                 font-size: 28px !important;
                 font-weight: 300 !important;
                 line-height: 1 !important;
@@ -856,5 +856,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 

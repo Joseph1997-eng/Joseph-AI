@@ -1,124 +1,35 @@
 /* --- Google Font --- */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
 
-/* --- ANIMATIONS --- */
+/* --- SIMPLE ANIMATIONS --- */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 @keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 @keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Animated Background Shapes */
-@keyframes floatShape1 {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-    25% {
-        transform: translate(100px, -100px) rotate(90deg);
-    }
-    50% {
-        transform: translate(200px, 0) rotate(180deg);
-    }
-    75% {
-        transform: translate(100px, 100px) rotate(270deg);
-    }
-}
-
-@keyframes floatShape2 {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-    50% {
-        transform: translate(-150px, 150px) rotate(180deg) scale(1.2);
-    }
-}
-
-@keyframes floatShape3 {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-    33% {
-        transform: translate(150px, 100px) rotate(120deg);
-    }
-    66% {
-        transform: translate(-100px, 150px) rotate(240deg);
-    }
-}
-
-/* Animation Classes */
-.animate-fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
-}
-
-.animate-slide-down {
-    animation: slideDown 0.6s ease-out forwards;
-}
-
-.animate-slide-up {
-    animation: slideUp 0.6s ease-out forwards;
-}
-
-.animate-pulse {
-    animation: pulse 2s ease-in-out infinite;
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* --- GLOBAL STYLES --- */
 * {
-    font-family: 'Noto Sans', 'Poppins', sans-serif !important;
+    font-family: 'Noto Sans', sans-serif !important;
 }
 
 body {
@@ -132,29 +43,21 @@ body {
     color: #FAFAFA;
 }
 
-[data-testid="stApp"] {
-    background: transparent;
-}
-
-/* --- 2. Sidebar Styling --- */
+/* --- 2. Sidebar --- */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0a0a15 0%, #1a1a2e 100%);
     border-right: 1px solid rgba(138, 43, 226, 0.3);
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease-in-out;
 }
 
 [data-testid="stSidebar"] > div:first-child {
-    background: transparent;
     padding-top: 1rem;
 }
 
-/* Sidebar Collapse Button */
+/* Sidebar Toggle Button */
 [data-testid="collapsedControl"] {
     background: linear-gradient(135deg, #6a5acd, #8a2be2) !important;
-    color: white !important;
-    border-radius: 8px;
-    transition: all 0.3s;
+    border-radius: 8px !important;
+    transition: all 0.3s !important;
 }
 
 [data-testid="collapsedControl"]:hover {
@@ -162,16 +65,7 @@ body {
     box-shadow: 0 4px 16px rgba(138, 43, 226, 0.6);
 }
 
-/* Sidebar when collapsed */
-[data-testid="stSidebar"][aria-expanded="false"] {
-    transform: translateX(-100%);
-}
-
-[data-testid="stSidebar"][aria-expanded="true"] {
-    transform: translateX(0);
-}
-
-/* User Profile Card */
+/* User Profile */
 .user-profile {
     background: linear-gradient(135deg, #2F2F2F 0%, #1F1F1F 100%);
     border-radius: 16px;
@@ -179,7 +73,6 @@ body {
     text-align: center;
     margin-bottom: 20px;
     border: 2px solid rgba(138, 43, 226, 0.3);
-    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.2);
     animation: fadeIn 0.6s ease-out;
 }
 
@@ -193,7 +86,6 @@ body {
     font-size: 18px;
     font-weight: 600;
     color: #a8c0ff;
-    text-transform: capitalize;
 }
 
 /* Sidebar Sections */
@@ -209,14 +101,12 @@ body {
     color: #a8c0ff;
     margin: 0 0 10px 0;
     font-size: 14px;
-    font-weight: 600;
 }
 
 .sidebar-section p {
     color: #ccc;
     font-size: 13px;
     margin: 0;
-    line-height: 1.5;
 }
 
 .sidebar-contact {
@@ -242,7 +132,6 @@ body {
 
 .sidebar-contact a:hover {
     color: #a8c0ff;
-    transform: translateX(5px);
 }
 
 /* Chat History */
@@ -262,7 +151,6 @@ body {
     transition: all 0.3s;
     width: 100%;
     font-weight: 500;
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
@@ -270,178 +158,20 @@ body {
     box-shadow: 0 6px 20px rgba(138, 43, 226, 0.5);
 }
 
-[data-testid="stSidebar"] .stButton > button:active {
-    transform: translateY(0);
+/* --- 3. Chat Messages --- */
+[data-testid="stChatMessage"] {
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.5s ease-out;
 }
 
-/* --- 3. Chat Message Styles - WhatsApp Style --- */
-
-/* Chat Bubble Container */
-.chat-bubble {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 16px;
-    animation: fadeIn 0.4s ease-out;
-    gap: 10px;
-}
-
-/* Assistant messages - LEFT side */
-.chat-bubble-assistant {
-    justify-content: flex-start;
-}
-
-/* User messages - RIGHT side */
-.chat-bubble-user {
-    justify-content: flex-end;
-}
-
-/* Chat Avatar */
-.chat-avatar {
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid #6a5acd;
-    box-shadow: 0 2px 8px rgba(106, 90, 205, 0.4);
-}
-
-.chat-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6a5acd, #8a2be2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    border: 2px solid #8a2be2;
-    box-shadow: 0 2px 8px rgba(138, 43, 226, 0.4);
-}
-
-/* Chat Content */
-.chat-content {
-    max-width: 70%;
-    position: relative;
-}
-
-/* Assistant Message Bubble */
-.chat-bubble-assistant .chat-content {
-    background: linear-gradient(135deg, #2F3E46 0%, #1F2A30 100%);
-    border-radius: 0 16px 16px 16px;
-    padding: 12px 16px;
-    border-left: 3px solid #6a5acd;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-.chat-bubble-assistant .chat-content::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 8px 8px 0;
-    border-color: transparent #2F3E46 transparent transparent;
-}
-
-/* User Message Bubble */
-.chat-bubble-user .chat-content {
-    background: linear-gradient(135deg, #6a5acd, #8a2be2);
-    border-radius: 16px 0 16px 16px;
-    padding: 12px 16px;
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4);
-    position: relative;
-}
-
-.chat-bubble-user .chat-content::before {
-    content: '';
-    position: absolute;
-    right: -8px;
-    top: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 8px 8px 0 0;
-    border-color: #6a5acd transparent transparent transparent;
-}
-
-/* Message Text */
-.chat-message-text {
+.chat-message-content {
     color: #FAFAFA;
-    line-height: 1.6;
+    line-height: 1.7;
     font-size: 15px;
     white-space: pre-wrap;
     word-wrap: break-word;
-    overflow-wrap: break-word;
-    text-align: justify;
-}
-
-.chat-bubble-user .chat-message-text {
-    color: #FFFFFF;
-    font-weight: 400;
-}
-
-/* Hover Effects */
-.chat-bubble:hover .chat-content {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-.chat-bubble-user:hover .chat-content {
-    box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
-}
-
-/* Timestamp (optional - can add later) */
-.chat-timestamp {
-    font-size: 11px;
-    color: #888;
-    margin-top: 4px;
-    text-align: right;
-}
-
-/* Remove default Streamlit chat message styles */
-[data-testid="stChatMessage"] {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-    .chat-content {
-        max-width: 85%;
-    }
-    
-    .chat-avatar,
-    .user-avatar {
-        width: 35px;
-        height: 35px;
-    }
-    
-    .user-avatar {
-        font-size: 18px;
-    }
-    
-    .chat-message-text {
-        font-size: 14px;
-    }
-    
-    .chat-bubble-assistant .chat-content,
-    .chat-bubble-user .chat-content {
-        padding: 10px 14px;
-        border-radius: 12px;
-    }
 }
 
 /* --- 4. Buttons --- */
@@ -454,38 +184,14 @@ body {
     transition: all 0.3s;
     font-weight: 500;
     box-shadow: 0 4px 16px rgba(138, 43, 226, 0.4);
-    position: relative;
-    overflow: hidden;
-}
-
-.stButton > button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.stButton > button:hover::before {
-    width: 300px;
-    height: 300px;
 }
 
 .stButton > button:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(138, 43, 226, 0.6);
 }
 
-.stButton > button:active {
-    transform: translateY(0);
-}
-
-/* --- 5. Text Input Fields --- */
+/* --- 5. Text Inputs --- */
 .stTextInput > div > div > input {
     background-color: rgba(47, 47, 47, 0.8);
     color: white;
@@ -493,32 +199,19 @@ body {
     border-radius: 12px;
     padding: 14px;
     transition: all 0.3s;
-    font-size: 15px;
 }
 
 .stTextInput > div > div > input:focus {
     border-color: #8a2be2;
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
-    background-color: rgba(47, 47, 47, 1);
-}
-
-/* Password Input */
-input[type="password"] {
-    letter-spacing: 2px;
 }
 
 /* Chat Input */
-[data-testid="stChatInput"] {
-    border-radius: 16px;
-}
-
 [data-testid="stChatInput"] textarea {
-    background: linear-gradient(135deg, rgba(47, 47, 47, 0.9), rgba(31, 31, 31, 0.9)) !important;
+    background: rgba(47, 47, 47, 0.9) !important;
     color: white !important;
     border: 2px solid rgba(138, 43, 226, 0.4) !important;
     border-radius: 16px !important;
-    padding: 12px !important;
-    font-size: 15px !important;
 }
 
 [data-testid="stChatInput"] textarea:focus {
@@ -526,23 +219,7 @@ input[type="password"] {
     box-shadow: 0 0 20px rgba(138, 43, 226, 0.5) !important;
 }
 
-/* --- 6. File Uploader --- */
-[data-testid="stFileUploader"] {
-    background: linear-gradient(135deg, rgba(47, 47, 47, 0.8), rgba(31, 31, 31, 0.8));
-    border-radius: 16px;
-    padding: 24px;
-    border: 2px dashed rgba(138, 43, 226, 0.5);
-    margin-bottom: 20px;
-    transition: all 0.3s;
-}
-
-[data-testid="stFileUploader"]:hover {
-    border-color: #8a2be2;
-    box-shadow: 0 4px 20px rgba(138, 43, 226, 0.3);
-    transform: scale(1.02);
-}
-
-/* --- 7. Title Container --- */
+/* --- 6. Title Container --- */
 .title-container {
     display: flex;
     align-items: center;
@@ -550,147 +227,46 @@ input[type="password"] {
     padding: 24px;
     background: linear-gradient(135deg, rgba(31, 31, 49, 0.9), rgba(22, 33, 62, 0.9));
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(138, 43, 226, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.title-container::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
+    animation: slideDown 0.6s ease-out;
 }
 
 .title-logo img {
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    object-fit: cover;
     margin-right: 24px;
     border: 4px solid #6a5acd;
-    box-shadow: 0 8px 24px rgba(106, 90, 205, 0.6);
-    position: relative;
-    z-index: 1;
-    transition: all 0.3s;
-}
-
-.title-logo img:hover {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.title-text {
-    position: relative;
-    z-index: 1;
+    animation: float 3s ease-in-out infinite;
 }
 
 .title-text h1 {
     margin: 0;
-    padding: 0;
     font-size: 2.4rem;
     font-weight: 700;
     background: linear-gradient(90deg, #a8c0ff, #8a2be2, #6a5acd);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: pulse 3s ease-in-out infinite;
 }
 
 .title-text h3 {
     margin: 8px 0 0 0;
-    padding: 0;
     color: #a8c0ff;
-    font-weight: 400;
     font-size: 1.2rem;
 }
 
-/* --- 8. Login Page --- */
-.login-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.floating-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-
-.shape {
-    position: absolute;
-    background: rgba(138, 43, 226, 0.1);
-    border-radius: 50%;
-}
-
-.shape-1 {
-    width: 300px;
-    height: 300px;
-    top: 10%;
-    left: 10%;
-    animation: floatShape1 20s ease-in-out infinite;
-}
-
-.shape-2 {
-    width: 200px;
-    height: 200px;
-    top: 60%;
-    right: 10%;
-    animation: floatShape2 15s ease-in-out infinite;
-}
-
-.shape-3 {
-    width: 250px;
-    height: 250px;
-    bottom: 10%;
-    left: 50%;
-    animation: floatShape3 18s ease-in-out infinite;
-}
-
-.login-container {
-    animation: fadeIn 0.8s ease-out;
-}
-
+/* --- 7. Login Page --- */
 .login-logo img {
     border-radius: 50%;
     width: 150px;
     height: 150px;
-    object-fit: cover;
     border: 5px solid #6a5acd;
-    box-shadow: 0 12px 40px rgba(106, 90, 205, 0.7);
-    transition: all 0.4s;
     animation: float 3s ease-in-out infinite;
+    transition: all 0.4s;
 }
 
 .login-logo img:hover {
     transform: scale(1.1) rotate(360deg);
-    box-shadow: 0 16px 56px rgba(106, 90, 205, 0.9);
-}
-
-.login-title {
-    text-align: center;
-    color: #a8c0ff;
-    font-size: 2.8rem;
-    font-weight: 700;
-    margin: 20px 0 10px 0;
-    animation-delay: 0.2s;
-}
-
-.login-subtitle {
-    text-align: center;
-    color: #888;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    animation-delay: 0.4s;
 }
 
 .info-box {
@@ -699,20 +275,17 @@ input[type="password"] {
     padding: 24px;
     margin: 20px 0;
     border: 2px solid rgba(138, 43, 226, 0.3);
-    box-shadow: 0 8px 32px rgba(138, 43, 226, 0.3);
-    animation-delay: 0.6s;
+    animation: fadeIn 0.8s ease-out;
 }
 
 .info-box h3 {
     color: #a8c0ff;
     margin: 0 0 15px 0;
-    font-size: 1.4rem;
 }
 
 .info-box p {
     color: #ccc;
     line-height: 1.6;
-    margin: 8px 0;
 }
 
 .login-footer {
@@ -720,31 +293,20 @@ input[type="password"] {
     margin-top: 50px;
     padding: 24px;
     color: #888;
-    font-size: 14px;
-    animation-delay: 0.8s;
+    animation: fadeIn 1s ease-out;
 }
 
 .login-footer a {
     color: #a8c0ff;
     text-decoration: none;
     transition: all 0.3s;
-    font-weight: 500;
-    margin: 0 10px;
 }
 
 .login-footer a:hover {
     color: #8a2be2;
-    text-decoration: underline;
-    transform: scale(1.05);
 }
 
-.copyright {
-    margin-top: 15px;
-    font-size: 12px;
-    color: #666;
-}
-
-/* --- 9. Welcome Message --- */
+/* --- 8. Welcome Message --- */
 .welcome-message {
     background: linear-gradient(135deg, rgba(31, 31, 49, 0.8), rgba(22, 33, 62, 0.8));
     border-radius: 20px;
@@ -753,20 +315,13 @@ input[type="password"] {
     margin: 40px auto;
     max-width: 900px;
     border: 2px solid rgba(138, 43, 226, 0.3);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.8s ease-out;
 }
 
 .welcome-message h2 {
     color: #a8c0ff;
     font-size: 2.2rem;
     margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.welcome-message p {
-    color: #ccc;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
 }
 
 .feature-grid {
@@ -785,7 +340,7 @@ input[type="password"] {
 }
 
 .feature-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-5px);
     border-color: #8a2be2;
     box-shadow: 0 12px 32px rgba(138, 43, 226, 0.4);
 }
@@ -799,15 +354,13 @@ input[type="password"] {
 .feature-card h4 {
     color: #a8c0ff;
     font-size: 1.2rem;
-    margin: 12px 0;
 }
 
 .feature-card p {
     color: #999;
-    font-size: 0.95rem;
 }
 
-/* --- 10. Tabs --- */
+/* --- 9. Tabs --- */
 .stTabs [data-baseweb="tab-list"] {
     gap: 12px;
     background: rgba(31, 31, 49, 0.5);
@@ -823,90 +376,11 @@ input[type="password"] {
     transition: all 0.3s;
 }
 
-.stTabs [data-baseweb="tab"]:hover {
-    background: rgba(106, 90, 205, 0.3);
-}
-
 .stTabs [aria-selected="true"] {
     background: linear-gradient(90deg, #6a5acd, #8a2be2);
-    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.4);
 }
 
-/* --- 11. Alerts --- */
-.stAlert {
-    border-radius: 12px;
-    border-left: 5px solid #6a5acd;
-    animation: slideDown 0.4s ease-out;
-}
-
-/* --- 12. Forms --- */
-.stForm {
-    background: rgba(31, 31, 49, 0.5);
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(138, 43, 226, 0.3);
-}
-
-/* --- 13. Expander --- */
-.streamlit-expanderHeader {
-    background-color: rgba(47, 47, 47, 0.6);
-    border-radius: 10px;
-    color: #FAFAFA;
-    transition: all 0.3s;
-}
-
-.streamlit-expanderHeader:hover {
-    background-color: rgba(106, 90, 205, 0.3);
-    transform: translateX(5px);
-}
-
-/* --- 14. Scrollbar --- */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(26, 26, 46, 0.5);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #6a5acd, #8a2be2);
-    border-radius: 10px;
-    border: 2px solid rgba(26, 26, 46, 0.5);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #8a2be2, #6a5acd);
-}
-
-/* --- 15. Spinner --- */
-.stSpinner > div {
-    border-top-color: #8a2be2 !important;
-    animation: rotate 1s linear infinite;
-}
-
-/* --- 16. Metrics --- */
-[data-testid="stMetricValue"] {
-    color: #a8c0ff;
-    font-size: 2rem;
-    font-weight: 700;
-}
-
-/* --- 17. Remove Streamlit Branding --- */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
-/* --- 18. Avatar Images --- */
-[data-testid="stChatMessage"] img {
-    border-radius: 50%;
-    border: 3px solid #6a5acd;
-    box-shadow: 0 4px 12px rgba(106, 90, 205, 0.5);
-}
-
-/* --- 19. Success/Error Messages --- */
+/* --- 10. Alerts --- */
 .stSuccess {
     background: linear-gradient(135deg, #1e7e34, #28a745);
     color: white;
@@ -936,27 +410,36 @@ header {visibility: hidden;}
     color: white;
     border-radius: 12px;
     padding: 16px;
-    border: 1px solid rgba(138, 43, 226, 0.5);
     animation: slideDown 0.4s ease-out;
 }
 
-/* --- 20. Loading Animation --- */
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-    100% {
-        background-position: 1000px 0;
-    }
+/* --- 11. Scrollbar --- */
+::-webkit-scrollbar {
+    width: 12px;
 }
 
-.loading {
-    animation: shimmer 2s infinite;
-    background: linear-gradient(to right, #1a1a2e 4%, #2a2a4e 25%, #1a1a2e 36%);
-    background-size: 1000px 100%;
+::-webkit-scrollbar-track {
+    background: rgba(26, 26, 46, 0.5);
 }
 
-/* --- 21. Responsive Design --- */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6a5acd, #8a2be2);
+    border-radius: 10px;
+}
+
+/* --- 12. Loading Animation --- */
+.loading-text span {
+    display: inline-block;
+    animation: pulse 1s ease-in-out infinite;
+    margin: 0 2px;
+}
+
+.loading-text span:nth-child(1) { animation-delay: 0s; }
+.loading-text span:nth-child(2) { animation-delay: 0.2s; }
+.loading-text span:nth-child(3) { animation-delay: 0.4s; }
+.loading-text span:nth-child(4) { animation-delay: 0.6s; }
+
+/* --- 13. Responsive --- */
 @media (max-width: 768px) {
     .title-container {
         flex-direction: column;
@@ -975,58 +458,23 @@ header {visibility: hidden;}
         font-size: 1.8rem;
     }
     
-    .title-text h3 {
-        font-size: 1rem;
-    }
-    
-    .login-title {
-        font-size: 2rem;
-    }
-    
     .feature-grid {
         grid-template-columns: 1fr;
     }
-    
-    .welcome-message {
-        padding: 24px;
-        margin: 20px 10px;
-    }
 }
 
-@media (max-width: 480px) {
-    .title-text h1 {
-        font-size: 1.5rem;
-    }
-    
-    .login-logo img {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .info-box {
-        padding: 16px;
-    }
-}
+/* --- 14. Hide Streamlit Branding --- */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
 
-/* --- 22. Smooth Transitions --- */
-button, input, textarea, [data-testid="stChatMessage"], 
-.feature-card, .sidebar-section, a {
+/* --- 15. Smooth Transitions --- */
+button, input, textarea, a {
     transition: all 0.3s ease;
 }
 
-/* --- 23. Focus Indicators --- */
-button:focus, input:focus, textarea:focus {
-    outline: 2px solid #8a2be2;
-    outline-offset: 2px;
-}
-
-/* --- 24. Selection Color --- */
+/* --- 16. Selection Color --- */
 ::selection {
-    background: rgba(138, 43, 226, 0.5);
-    color: white;
-}
-
-::-moz-selection {
     background: rgba(138, 43, 226, 0.5);
     color: white;
 }

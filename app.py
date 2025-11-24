@@ -3,7 +3,6 @@ import google.generativeai as genai
 import sqlite3
 import hashlib
 import uuid
-import json
 from datetime import datetime
 import os
 
@@ -11,7 +10,6 @@ import os
 # 1. CONFIGURATION
 # ---------------------------------------------------------
 
-# Load API Key
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
@@ -19,10 +17,11 @@ except:
 
 if API_KEY:
     genai.configure(api_key=API_KEY)
+else:
+    st.error("⚠️ API Key not found!")
 
 BOT_AVATAR = "https://raw.githubusercontent.com/Joseph1997-eng/Joseph-AI/main/joseph.JPG"
 
-# Load System Prompt
 def load_system_prompt():
     try:
         return st.secrets["SYSTEM_PROMPT"]
@@ -42,30 +41,7 @@ def load_css(file_name):
         pass
 
 # ---------------------------------------------------------
-# 2. REMEMBER LOGIN (Cookie Storage)
-# ---------------------------------------------------------
-
-def save_credentials(username, password):
-    """Save login credentials to browser local storage"""
-    credentials = {"username": username, "password": password}
-    st.session_state['saved_credentials'] = json.dumps(credentials)
-    
-def load_saved_credentials():
-    """Load saved credentials"""
-    if 'saved_credentials' in st.session_state:
-        try:
-            return json.loads(st.session_state['saved_credentials'])
-        except:
-            return None
-    return None
-
-def clear_saved_credentials():
-    """Clear saved credentials"""
-    if 'saved_credentials' in st.session_state:
-        del st.session_state['saved_credentials']
-
-# ---------------------------------------------------------
-# 3. DATABASE FUNCTIONS
+# 2. DATABASE FUNCTIONS
 # ---------------------------------------------------------
 
 def init_db():
@@ -146,7 +122,7 @@ def delete_all_sessions(username):
     conn.close()
 
 # ---------------------------------------------------------
-# 4. MODEL SETTINGS
+# 3. MODEL SETTINGS
 # ---------------------------------------------------------
 
 system_prompt = load_system_prompt()
@@ -155,6 +131,43 @@ model = genai.GenerativeModel(
     system_instruction=system_prompt,
     generation_config=genai.GenerationConfig(temperature=0.8, max_output_tokens=4000)
 )
+
+# ---------------------------------------------------------
+# 4. COPY BUTTON
+# ---------------------------------------------------------
+
+def create_copy_button_html(text, unique_id):
+    import json
+    text_json = json.dumps(text)
+    
+    return f"""
+    <div style="margin-bottom: 10px; text-align: right;">
+        <button id="copy_btn_{unique_id}" onclick="copyText_{unique_id}()" 
+                style="background: linear-gradient(90deg, #667eea, #764ba2); color: white; border: none; 
+                       border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; 
+                       font-weight: 500; transition: all 0.3s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);"
+                onmouseover="this.style.transform='scale(1.05)';" 
+                onmouseout="this.style.transform='scale(1)';">
+            📋 Copy
+        </button>
+    </div>
+    <script>
+    function copyText_{unique_id}() {{
+        const text = {text_json};
+        if (navigator.clipboard) {{
+            navigator.clipboard.writeText(text).then(() => {{
+                const btn = document.getElementById('copy_btn_{unique_id}');
+                btn.innerHTML = '✅ Copied!';
+                btn.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
+                setTimeout(() => {{
+                    btn.innerHTML = '📋 Copy';
+                    btn.style.background = 'linear-gradient(90deg, #667eea, #764ba2)';
+                }}, 2000);
+            }});
+        }}
+    }}
+    </script>
+    """
 
 # ---------------------------------------------------------
 # 5. MAIN APP
@@ -178,17 +191,6 @@ def main():
         st.session_state["username"] = ""
     if "session_id" not in st.session_state:
         st.session_state["session_id"] = str(uuid.uuid4())
-    if "remember_me" not in st.session_state:
-        st.session_state["remember_me"] = False
-
-    # Try auto-login if credentials saved
-    if not st.session_state["logged_in"]:
-        saved_creds = load_saved_credentials()
-        if saved_creds:
-            if login_user(saved_creds['username'], saved_creds['password']):
-                st.session_state["logged_in"] = True
-                st.session_state["username"] = saved_creds['username']
-                st.rerun()
 
     # ---------------------------------------------------------
     # LOGIN PAGE
@@ -204,34 +206,25 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             
-            tab1, tab2 = st.tabs(["Sign In", "Register"])
+            tab1, tab2 = st.tabs(["🔐 Sign In", "📝 Register"])
             
             with tab1:
                 with st.form("login_form"):
-                    u = st.text_input("Username", placeholder="Na min Tialnak")
+                    u = st.text_input("Username", placeholder="Min Tialnak")
                     p = st.text_input("Password", type='password', placeholder="Password Tialnak")
-                    remember = st.checkbox("Remember Me", value=True)
                     
-                    col_a, col_b = st.columns(2)
-                    with col_a:
-                        login_btn = st.form_submit_button("Login", use_container_width=True)
-                    
-                    if login_btn:
+                    if st.form_submit_button("Login", use_container_width=True):
                         if u and p:
                             hp = make_hashes(p)
                             if login_user(u, hp):
                                 st.session_state["logged_in"] = True
                                 st.session_state["username"] = u
-                                
-                                if remember:
-                                    save_credentials(u, hp)
-                                
                                 st.success("✅ Login successful!")
                                 st.rerun()
                             else:
                                 st.error("❌ Invalid credentials!")
                         else:
-                            st.warning("⚠️ Please fill all fields!")
+                            st.warning("⚠️ Fill all fields!")
             
             with tab2:
                 with st.form("register_form"):
@@ -239,9 +232,7 @@ def main():
                     np = st.text_input("Password", type='password', placeholder="Password Thar Tialnak")
                     np2 = st.text_input("Confirm Password", type='password', placeholder="Password Thar Tial Thannak")
                     
-                    register_btn = st.form_submit_button("Register", use_container_width=True)
-                    
-                    if register_btn:
+                    if st.form_submit_button("Register", use_container_width=True):
                         if nu and np and np2:
                             if np != np2:
                                 st.error("❌ Passwords don't match!")
@@ -253,19 +244,41 @@ def main():
                                 else:
                                     st.error("❌ Username exists!")
                         else:
-                            st.warning("⚠️ Please fill all fields!")
+                            st.warning("⚠️ Fill all fields!")
+            
+            st.markdown("""
+            <div class='login-footer'>
+                <p><a href='https://github.com/Joseph1997-eng' target='_blank'>GitHub</a> | 
+                   <a href='mailto:josephsaimonn@gmail.com'>Email</a></p>
+                <p class='copyright'>© 2025 Joseph's Assistant</p>
+            </div>
+            """, unsafe_allow_html=True)
 
     # ---------------------------------------------------------
     # CHAT PAGE
     # ---------------------------------------------------------
     else:
-        # Sidebar
+        # SIDEBAR
         with st.sidebar:
-            st.markdown(f"### 👤 {st.session_state['username']}")
+            st.markdown(f"""
+            <div class="user-profile">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name">{st.session_state['username']}</div>
+            </div>
+            """, unsafe_allow_html=True)
             
             if st.button("➕ New Chat", use_container_width=True):
                 st.session_state["session_id"] = str(uuid.uuid4())
                 st.rerun()
+            
+            st.markdown("---")
+            
+            st.markdown("""
+            <div class="sidebar-section">
+                <h4>🎯 Objectives</h4>
+                <p>Lai holh tein bia ruah khawh le fimnak hrawmh.</p>
+            </div>
+            """, unsafe_allow_html=True)
             
             st.markdown("---")
             st.markdown("### 📝 Chat History")
@@ -300,13 +313,20 @@ def main():
             
             st.markdown("---")
             
+            st.markdown("""
+            <div class="sidebar-contact">
+                <h4>📞 Contact</h4>
+                <p><a href='https://github.com/Joseph1997-eng' target='_blank'>🔗 GitHub</a></p>
+                <p><a href='mailto:josephsaimonn@gmail.com'>📧 Email</a></p>
+            </div>
+            """, unsafe_allow_html=True)
+            
             if st.button("🚪 Logout", use_container_width=True, type="secondary"):
-                clear_saved_credentials()
                 st.session_state["logged_in"] = False
                 st.session_state["username"] = ""
                 st.rerun()
 
-        # Main Chat Area
+        # MAIN CHAT AREA
         st.markdown(f"""
         <div class='chat-header'>
             <img src='{BOT_AVATAR}' class='header-avatar'>
@@ -317,9 +337,10 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Display Messages
+        # Get Messages
         db_messages = get_chat_history(st.session_state["session_id"])
         
+        # Welcome Message
         if not db_messages:
             st.markdown("""
             <div class='welcome-box'>
@@ -328,18 +349,41 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         
-        for role, content in db_messages:
-            with st.chat_message(role, avatar=BOT_AVATAR if role == "assistant" else "👤"):
-                st.markdown(content)
+        # Display Messages - WhatsApp Style
+        for idx, (role, content) in enumerate(db_messages):
+            if role == "assistant":
+                # AI on LEFT
+                col1, col2, col3 = st.columns([0.7, 0.05, 0.25])
+                with col1:
+                    st.markdown(f"""
+                    <div class="chat-bubble chat-bubble-left">
+                        <img src="{BOT_AVATAR}" class="chat-avatar">
+                        <div class="chat-content-left">{content}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    import streamlit.components.v1 as components
+                    unique_id = f"msg_{st.session_state['session_id'][:8]}_{idx}"
+                    components.html(create_copy_button_html(content, unique_id), height=50)
+            else:
+                # USER on RIGHT
+                col1, col2, col3 = st.columns([0.25, 0.05, 0.7])
+                with col3:
+                    st.markdown(f"""
+                    <div class="chat-bubble chat-bubble-right">
+                        <div class="chat-content-right">{content}</div>
+                        <div class="user-avatar">👤</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
         # File Upload
         uploaded_file = st.file_uploader(
             "📎 Upload file (optional)",
-            type=["pdf", "jpg", "png", "jpeg", "txt", "mp4"]
+            type=["pdf", "jpg", "png", "jpeg", "txt", "docx", "xlsx", "mp4"]
         )
 
         # Chat Input
-        user_input = st.chat_input(" 💭Bia Halnak...")
+        user_input = st.chat_input("Type your message...")
         
         if user_input:
             save_chat_message(st.session_state["session_id"], st.session_state["username"], "user", user_input)
@@ -349,9 +393,12 @@ def main():
         if db_messages and db_messages[-1][0] == 'user':
             current_prompt = db_messages[-1][1]
             
-            with st.chat_message("assistant", avatar=BOT_AVATAR):
+            col1, col2, col3 = st.columns([0.7, 0.05, 0.25])
+            with col1:
                 with st.spinner("Thinking..."):
                     try:
+                        import streamlit.components.v1 as components
+                        
                         gemini_hist = []
                         for r, c in db_messages[:-1]:
                             role_name = "model" if r == "assistant" else "user"
@@ -371,7 +418,16 @@ def main():
                             response = chat.send_message(full_prompt)
                         
                         final_text = response.text.replace("*", "")
-                        st.markdown(final_text)
+                        
+                        st.markdown(f"""
+                        <div class="chat-bubble chat-bubble-left">
+                            <img src="{BOT_AVATAR}" class="chat-avatar">
+                            <div class="chat-content-left">{final_text}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        unique_id = f"latest_{st.session_state['session_id'][:8]}"
+                        components.html(create_copy_button_html(final_text, unique_id), height=50)
                         
                         save_chat_message(st.session_state["session_id"], st.session_state["username"], "assistant", final_text)
                         

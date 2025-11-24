@@ -379,11 +379,11 @@ def main():
         # File Upload
         uploaded_file = st.file_uploader(
             "📎 Upload file (optional)",
-            type=["pdf", "jpg", "png", "jpeg", "txt", "docx", "xlsx", "mp4"]
+            type=["pdf", "jpg", "png", "jpeg", "txt", "mp4"]
         )
 
         # Chat Input
-        user_input = st.chat_input("Type your message...")
+        user_input = st.chat_input("💭Bial halnak...")
         
         if user_input:
             save_chat_message(st.session_state["session_id"], st.session_state["username"], "user", user_input)
@@ -395,7 +395,7 @@ def main():
             
             col1, col2, col3 = st.columns([0.7, 0.05, 0.25])
             with col1:
-                with st.spinner("Thinking..."):
+                with st.spinner("💭 Ka ruah ta lio..."):
                     try:
                         import streamlit.components.v1 as components
                         
@@ -436,3 +436,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

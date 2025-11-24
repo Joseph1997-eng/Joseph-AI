@@ -7,11 +7,6 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
@@ -37,10 +32,78 @@
 [data-testid="stSidebar"] h3 {
     color: #a8c0ff;
     font-size: 16px;
-    margin-bottom: 10px;
 }
 
-/* --- Sidebar Buttons --- */
+/* User Profile */
+.user-profile {
+    background: linear-gradient(135deg, #2F2F2F 0%, #1F1F1F 100%);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.profile-avatar {
+    font-size: 48px;
+    margin-bottom: 10px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #a8c0ff;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+    background: rgba(47, 47, 47, 0.5);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    border-left: 4px solid #667eea;
+}
+
+.sidebar-section h4 {
+    color: #a8c0ff;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.sidebar-section p {
+    color: #ccc;
+    font-size: 13px;
+    margin: 0;
+}
+
+.sidebar-contact {
+    background: rgba(47, 47, 47, 0.5);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+
+.sidebar-contact h4 {
+    color: #a8c0ff;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.sidebar-contact a {
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: block;
+    margin: 5px 0;
+}
+
+.sidebar-contact a:hover {
+    color: #a8c0ff;
+}
+
+/* Sidebar Buttons */
 [data-testid="stSidebar"] .stButton > button {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -65,7 +128,7 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     margin-bottom: 20px;
-    animation: slideDown 0.5s ease-out;
+    animation: fadeIn 0.5s ease-out;
 }
 
 .header-avatar {
@@ -87,23 +150,72 @@
     font-size: 14px;
 }
 
-/* --- Chat Messages --- */
-[data-testid="stChatMessage"] {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 10px;
+/* --- WhatsApp Style Chat Bubbles --- */
+.chat-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
     animation: fadeIn 0.4s ease-out;
 }
 
-[data-testid="stChatMessage"][data-testid*="user"] {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-    border-left: 3px solid #667eea;
+/* AI Messages - LEFT */
+.chat-bubble-left {
+    justify-content: flex-start;
 }
 
-[data-testid="stChatMessage"][data-testid*="assistant"] {
-    background: rgba(255, 255, 255, 0.03);
-    border-left: 3px solid #764ba2;
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #667eea;
+    flex-shrink: 0;
+}
+
+.chat-content-left {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+    border-left: 3px solid #667eea;
+    border-radius: 0 16px 16px 16px;
+    padding: 12px 16px;
+    max-width: 100%;
+    color: #ffffff;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* User Messages - RIGHT */
+.chat-bubble-right {
+    justify-content: flex-end;
+    display: flex;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 2px solid #764ba2;
+}
+
+.chat-content-right {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 16px 0 16px 16px;
+    padding: 12px 16px;
+    max-width: 100%;
+    color: #ffffff;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    text-align: right;
 }
 
 /* --- Buttons --- */
@@ -185,6 +297,28 @@
     margin: 0 0 30px 0;
 }
 
+.login-footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #888;
+}
+
+.login-footer a {
+    color: #667eea;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.login-footer a:hover {
+    color: #a8c0ff;
+}
+
+.copyright {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
 /* --- Welcome Box --- */
 .welcome-box {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
@@ -224,18 +358,6 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* --- Checkbox --- */
-.stCheckbox {
-    color: #a8c0ff;
-}
-
-/* --- Forms --- */
-.stForm {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 20px;
-    border-radius: 12px;
-}
-
 /* --- Alerts --- */
 .stSuccess {
     background: rgba(34, 197, 94, 0.2);
@@ -259,11 +381,6 @@
     background: rgba(102, 126, 234, 0.2);
     border-left: 4px solid #667eea;
     color: #a8c0ff;
-}
-
-/* --- Spinner --- */
-.stSpinner > div {
-    border-top-color: #667eea !important;
 }
 
 /* --- Scrollbar --- */
@@ -300,9 +417,24 @@ header {visibility: hidden;}
     .chat-header h2 {
         font-size: 20px;
     }
+    
+    .chat-bubble {
+        gap: 8px;
+    }
+    
+    .chat-avatar, .user-avatar {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .chat-content-left,
+    .chat-content-right {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
 }
 
-/* --- Smooth Transitions --- */
+/* --- Transitions --- */
 button, input, textarea {
     transition: all 0.3s ease;
 }
